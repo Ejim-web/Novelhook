@@ -1,1 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>NovelRead - Read Stories</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            color: #1a1a1a;
+        }
+
+        /* App Bar */
+        .app-bar {
+            background: #6C63FF;
+            color: white;
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .app-bar h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .app-bar p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 16px;
+            border-top: 1px solid #e0e0e0;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.05);
+        }
+
+        .nav-item {
+            text-align: center;
+            background: none;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: #6C63FF;
+        }
+
+        .nav-item span {
+            font-size: 20px;
+            display: block;
+        }
+
+        .nav-item label {
+            font-size: 11px;
+            margin-top: 4px;
+            display: block;
+        }
+
+        /* Main Content Area */
+        .content {
+            padding: 20px;
+            padding-bottom: 80px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Screen visibility */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Novel Cards */
+        .novel-card {
+            background: white;
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .novel-card:active {
+            transform: scale(0.98);
+        }
+
+        .novel-cover {
+            width: 80px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .novel-info {
+            flex: 1;
+        }
+
+        .novel-title {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .novel-author {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .novel-stats {
+            font-size: 12px;
+            color: #6C63FF;
+        }
+
+        /* Reading Screen */
+        .chapter-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chapter-content {
+            font-size: 17px;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .chapter-content p {
+            margin-bottom: 16px;
+        }
+
+        .unlock-section {
+            background: #f0f0f0;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .unlock-button {
+            background: #6C63FF;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 40px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 16px;
+            cursor: pointer;
+        }
+
+        .back-button {
+            background: none;
+            border: none;
+            color: #6C63FF;
+            font-size: 16px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Writer Dashboard */
+        .writer-card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .write-btn {
+            background: #6C63FF;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-family: inherit;
+        }
+
+        /* Wallet */
+        .coin-balance {
+            background: linear-gradient(135deg, #6C63FF, #8B80FF);
+            color: white;
+            border-radius: 20px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .coin-amount {
+            font-size: 48px;
+            font-weight: 700;
+        }
+
+        .purchase-option {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 24px;
+            padding: 32px 24px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #333;
+        }
+
+        /* Utility */
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-container">
+    <div class="login-card">
+        <h2>📚 NovelRead</h2>
+        <input type="email" id="loginEmail" placeholder="Email">
+        <input type="password" id="loginPassword" placeholder="Password">
+        <button class="write-btn" onclick="login()">Login</button>
+        <p style="text-align: center; margin-top: 16px;">
+            <a href="#" onclick="showRegister()">Don't have an account? Register</a>
+        </p>
+    </div>
+</div>
+
+<!-- REGISTER SCREEN (hidden initially) -->
+<div id="registerScreen" class="login-container hidden">
+    <div class="login-card">
+        <h2>Create Account</h2>
+        <input type="text" id="regName" placeholder="Full Name">
+        <input type="email" id="regEmail" placeholder="Email">
+        <input type="password" id="regPassword" placeholder="Password">
+        <select id="regRole" style="width:100%; padding:12px; margin-bottom:16px; border-radius:8px; border:1px solid #ddd;">
+            <option value="reader">Reader</option>
+            <option value="writer">Writer</option>
+        </select>
+        <button class="write-btn" onclick="register()">Register</button>
+        <p style="text-align: center; margin-top: 16px;">
+            <a href="#" onclick="showLogin()">Already have an account? Login</a>
+        </p>
+    </div>
+</div>
+
+<!-- MAIN APP (hidden until login) -->
+<div id="mainApp" style="display: none;">
+    <div class="app-bar">
+        <h1 id="appTitle">📖 NovelRead</h1>
+        <p id="userGreeting"></p>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="showScreen('home')">
+            <span>🏠</span>
+            <label>Home</label>
+        </button>
+        <button class="nav-item" onclick="showScreen('library')">
+            <span>📚</span>
+            <label>Library</label>
+        </button>
+        <button class="nav-item" onclick="showScreen('writer')" id="writerNavBtn" style="display: none;">
+            <span>✍️</span>
+            <label>Write</label>
+        </button>
+        <button class="nav-item" onclick="showScreen('wallet')">
+            <span>💰</span>
+            <label>Wallet</label>
+        </button>
+        <button class="nav-item" onclick="showScreen('profile')">
+            <span>👤</span>
+            <label>Profile</label>
+        </button>
+    </div>
+
+    <div class="content" id="contentArea">
+        <!-- HOME SCREEN -->
+        <div id="homeScreen" class="screen active">
+            <div id="novelList"></div>
+        </div>
+
+        <!-- LIBRARY SCREEN -->
+        <div id="libraryScreen" class="screen">
+            <h3>My Library</h3>
+            <div id="libraryList"></div>
+        </div>
+
+        <!-- WRITER SCREEN -->
+        <div id="writerScreen" class="screen">
+            <button class="write-btn" onclick="showCreateNovelForm()">+ Create New Novel</button>
+            <div id="writerNovelList"></div>
+            
+            <!-- Create Novel Form (hidden) -->
+            <div id="createNovelForm" style="display: none;">
+                <h3>Create New Novel</h3>
+                <input type="text" id="novelTitle" placeholder="Novel Title">
+                <textarea id="novelDescription" rows="3" placeholder="Description"></textarea>
+                <button class="write-btn" onclick="createNovel()">Publish Novel</button>
+                <button class="write-btn" style="background:#999;" onclick="hideCreateNovelForm()">Cancel</button>
+            </div>
+        </div>
+
+        <!-- WALLET SCREEN -->
+        <div id="walletScreen" class="screen">
+            <div class="coin-balance">
+                <div style="font-size:14px; opacity:0.9;">Your Coins</div>
+                <div class="coin-amount" id="coinAmount">0</div>
+            </div>
+            <h3>Buy Coins</h3>
+            <div class="purchase-option" onclick="buyCoins(100, 99)">
+                <span>💰 100 Coins</span>
+                <span style="font-weight:bold;">$0.99</span>
+            </div>
+            <div class="purchase-option" onclick="buyCoins(500, 399)">
+                <span>💰 500 Coins</span>
+                <span style="font-weight:bold;">$3.99</span>
+            </div>
+            <div class="purchase-option" onclick="buyCoins(1000, 699)">
+                <span>💰 1000 Coins</span>
+                <span style="font-weight:bold;">$6.99</span>
+            </div>
+        </div>
+
+        <!-- PROFILE SCREEN -->
+        <div id="profileScreen" class="screen">
+            <div class="writer-card">
+                <h3 id="profileName"></h3>
+                <p id="profileEmail"></p>
+                <p id="profileRole"></p>
+                <hr style="margin: 16px 0;">
+                <button class="write-btn" style="background:#dc3545;" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- READING SCREEN (dynamic) -->
+        <div id="readingScreen" class="screen">
+            <button class="back-button" onclick="closeReading()">← Back to Library</button>
+            <div id="readingContent"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ============================================
+    // DATA STORAGE (using localStorage as a database)
+    // ============================================
+    
+    let currentUser = null;
+    let currentNovel = null;
+    let currentChapter = null;
+    
+    // Initialize data structures
+    function initData() {
+        if (!localStorage.getItem('users')) {
+            const users = {
+                'admin@novelread.com': {
+                    name: 'Admin User',
+                    email: 'admin@novelread.com',
+                    password: 'admin123',
+                    role: 'admin',
+                    coins: 9999,
+                    library: [],
+                    createdAt: new Date().toISOString()
+                }
+            };
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        if (!localStorage.getItem('novels')) {
+            const novels = [
+                {
+                    id: 'novel1',
+                    title: 'Pregnant for My Cold Billionaire Husband',
+                    author: 'Ejim Chinedu',
+                    authorEmail: 'admin@novelread.com',
+                    description: 'A hotel server. A cold billionaire. One night changes everything.',
+                    cover: '🤰',
+                    chapters: [
+                        { id: 'ch1', title: 'Chapter 1: The Night That Changed Everything', content: '<p>Amara stared at the pregnancy test. The word "Positive" stared back. Her hands trembled.</p><p>She couldn\'t remember everything about that night. But she remembered Suite 709. And the man who owned it.</p><p>Alexander Okafor. The coldest billionaire in the city.</p><p>"I need to see him," she whispered.</p><p>She didn\'t know that one knock would change her life forever.</p>', isLocked: false, price: 0 },
+                        { id: 'ch2', title: 'Chapter 2: A Deal with the Devil', content: '<p>"You\'re pregnant with my child," Alexander said. His voice was ice.</p><p>Amara stood in his mansion, surrounded by luxury she had never imagined.</p><p>"I don\'t want your money."</p><p>"Then what do you want?"</p><p>"Nothing from you."</p><p>He stepped closer. "You will marry me."</p><p>It wasn\'t a question. It was a command.</p>', isLocked: true, price: 50 },
+                        { id: 'ch3', title: 'Chapter 3: The Golden Cage', content: '<p>The wedding had no flowers. No guests. No love.</p><p>Just a contract. Just obligation.</p><p>Amara became Mrs. Okafor in a cold courthouse.</p><p>"This isn\'t a marriage," she told herself that night, alone in her wing of the mansion.</p><p>But she had made a promise to her unborn child.</p><p>She would survive.</p>', isLocked: true, price: 50 }
+                    ]
+                }
+            ];
+            localStorage.setItem('novels', JSON.stringify(novels));
+        }
+    }
+    
+    // Authentication functions
+    function login() {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        
+        const users = JSON.parse(localStorage.getItem('users'));
+        
+        if (users[email] && users[email].password === password) {
+            currentUser = users[email];
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            showMainApp();
+            loadNovels();
+            updateUI();
+        } else {
+            alert('Invalid email or password');
+        }
+    }
+    
+    function register() {
+        const name = document.getElementById('regName').value;
+        const email = document.getElementById('regEmail').value;
+        const password = document.getElementById('regPassword').value;
+        const role = document.getElementById('regRole').value;
+        
+        if (!name || !email || !password) {
+            alert('Please fill all fields');
+            return;
+        }
+        
+        const users = JSON.parse(localStorage.getItem('users'));
+        
+        if (users[email]) {
+            alert('Email already exists');
+            return;
+        }
+        
+        const newUser = {
+            name: name,
+            email: email,
+            password: password,
+            role: role,
+            coins: 100,
+            library: [],
+            createdAt: new Date().toISOString()
+        };
+        
+        users[email] = newUser;
+        localStorage.setItem('users', JSON.stringify(users));
+        
+        currentUser = newUser;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        showMainApp();
+        loadNovels();
+        updateUI();
+    }
+    
+    function logout() {
+        currentUser = null;
+        localStorage.removeItem('currentUser');
+        document.getElementById('mainApp').style.display = 'none';
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('registerScreen').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('login-container');
+        document.getElementById('loginScreen').style.display = 'flex';
+    }
+    
+    function showRegister() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('registerScreen').classList.remove('hidden');
+    }
+    
+    function showLogin() {
+        document.getElementById('registerScreen').classList.add('hidden');
+        document.getElementById('loginScreen').style.display = 'flex';
+    }
+    
+    function showMainApp() {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('registerScreen').classList.add('hidden');
+        document.getElementById('mainApp').style.display = 'block';
+    }
+    
+    // UI Functions
+    function updateUI() {
+        document.getElementById('userGreeting').innerHTML = `Welcome, ${currentUser.name}`;
+        document.getElementById('coinAmount').innerText = currentUser.coins;
+        document.getElementById('profileName').innerText = currentUser.name;
+        document.getElementById('profileEmail').innerText = currentUser.email;
+        document.getElementById('profileRole').innerText = `Role: ${currentUser.role}`;
+        
+        // Show/hide writer nav based on role
+        if (currentUser.role === 'writer' || currentUser.role === 'admin') {
+            document.getElementById('writerNavBtn').style.display = 'block';
+        } else {
+            document.getElementById('writerNavBtn').style.display = 'none';
+        }
+        
+        // Load writer novels if on writer screen
+        if (document.getElementById('writerScreen').classList.contains('active')) {
+            loadWriterNovels();
+        }
+        
+        loadLibrary();
+    }
+    
+    function showScreen(screenName) {
+        // Hide all screens
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        
+        // Show selected screen
+        document.getElementById(`${screenName}Screen`).classList.add('active');
+        
+        // Update nav active states
+        document.querySelectorAll('.nav-item').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.closest('.nav-item').classList.add('active');
+        
+        // Load data based on screen
+        if (screenName === 'home') loadNovels();
+        if (screenName === 'library') loadLibrary();
+        if (screenName === 'writer') loadWriterNovels();
+        if (screenName === 'wallet') updateUI();
+    }
+    
+    function loadNovels() {
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        const novelListDiv = document.getElementById('novelList');
+        
+        novelListDiv.innerHTML = novels.map(novel => `
+            <div class="novel-card" onclick="openNovel('${novel.id}')">
+                <div class="novel-cover">${novel.cover}</div>
+                <div class="novel-info">
+                    <div class="novel-title">${novel.title}</div>
+                    <div class="novel-author">By ${novel.author}</div>
+                    <div class="novel-stats">📖 ${novel.chapters.length} chapters</div>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function loadLibrary() {
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        const userLibrary = currentUser.library || [];
+        
+        const libraryNovels = novels.filter(novel => userLibrary.includes(novel.id));
+        const libraryListDiv = document.getElementById('libraryList');
+        
+        if (libraryNovels.length === 0) {
+            libraryListDiv.innerHTML = '<p style="text-align:center; color:#999;">No novels in your library. Go to Home to add some!</p>';
+        } else {
+            libraryListDiv.innerHTML = libraryNovels.map(novel => `
+                <div class="novel-card" onclick="openNovel('${novel.id}')">
+                    <div class="novel-cover">${novel.cover}</div>
+                    <div class="novel-info">
+                        <div class="novel-title">${novel.title}</div>
+                        <div class="novel-author">By ${novel.author}</div>
+                        <div class="novel-stats">📖 ${novel.chapters.length} chapters</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function openNovel(novelId) {
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        currentNovel = novels.find(n => n.id === novelId);
+        
+        // Add to library if not already
+        if (!currentUser.library.includes(novelId)) {
+            currentUser.library.push(novelId);
+            const users = JSON.parse(localStorage.getItem('users'));
+            users[currentUser.email].library = currentUser.library;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        
+        showReadingScreen();
+    }
+    
+    function showReadingScreen() {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.getElementById('readingScreen').classList.add('active');
+        
+        const readingContent = document.getElementById('readingContent');
+        
+        readingContent.innerHTML = `
+            <div class="chapter-title">${currentNovel.title}</div>
+            ${currentNovel.chapters.map((chapter, index) => `
+                <div class="writer-card" onclick="readChapter(${index})">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <strong>${chapter.title}</strong>
+                            ${chapter.isLocked && !currentUser.library.includes(currentNovel.id) ? 
+                                `<div style="font-size:12px; color:#6C63FF;">🔒 ${chapter.price} coins to unlock</div>` : 
+                                '<div style="font-size:12px; color:green;">✅ Unlocked</div>'
+                            }
+                        </div>
+                        <div>📖 Read →</div>
+                    </div>
+                </div>
+            `).join('')}
+            <button class="back-button" onclick="closeReading()">← Back</button>
+        `;
+    }
+    
+    function readChapter(chapterIndex) {
+        const chapter = currentNovel.chapters[chapterIndex];
+        
+        // Check if chapter is locked
+        if (chapter.isLocked && !currentUser.library.includes(currentNovel.id)) {
+            if (currentUser.coins >= chapter.price) {
+                if (confirm(`This chapter costs ${chapter.price} coins. Purchase now?`)) {
+                    currentUser.coins -= chapter.price;
+                    const users = JSON.parse(localStorage.getItem('users'));
+                    users[currentUser.email].coins = currentUser.coins;
+                    localStorage.setItem('users', JSON.stringify(users));
+                    updateUI();
+                    alert('Chapter unlocked!');
+                    chapter.isLocked = false;
+                    
+                    // Update novel in storage
+                    const novels = JSON.parse(localStorage.getItem('novels'));
+                    const novelIndex = novels.findIndex(n => n.id === currentNovel.id);
+                    novels[novelIndex].chapters[chapterIndex].isLocked = false;
+                    localStorage.setItem('novels', JSON.stringify(novels));
+                    
+                    showReadingScreen();
+                }
+            } else {
+                alert(`Not enough coins! You need ${chapter.price} coins. Go to Wallet to buy more.`);
+                showScreen('wallet');
+            }
+            return;
+        }
+        
+        // Display chapter content
+        const readingContent = document.getElementById('readingContent');
+        readingContent.innerHTML = `
+            <button class="back-button" onclick="showReadingScreen()">← Back to Chapters</button>
+            <div class="chapter-title">${chapter.title}</div>
+            <div class="chapter-content">${chapter.content}</div>
+            <div style="margin-top: 20px; text-align: center; color: #999; font-size: 12px;">
+                ❤️ Enjoying this story? Leave a comment!
+            </div>
+        `;
+    }
+    
+    function closeReading() {
+        showScreen('home');
+        loadNovels();
+    }
+    
+    // Writer functions
+    function loadWriterNovels() {
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        const myNovels = novels.filter(n => n.authorEmail === currentUser.email);
+        
+        const writerNovelList = document.getElementById('writerNovelList');
+        
+        if (myNovels.length === 0) {
+            writerNovelList.innerHTML = '<p style="text-align:center; color:#999;">You haven\'t published any novels yet.</p>';
+        } else {
+            writerNovelList.innerHTML = myNovels.map(novel => `
+                <div class="writer-card">
+                    <h4>${novel.title}</h4>
+                    <p>${novel.description}</p>
+                    <div style="font-size:12px; color:#666;">📖 ${novel.chapters.length} chapters</div>
+                    <button class="write-btn" style="margin-top:12px; background:#28a745;" onclick="addChapterToNovel('${novel.id}')">+ Add Chapter</button>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function showCreateNovelForm() {
+        document.getElementById('createNovelForm').style.display = 'block';
+    }
+    
+    function hideCreateNovelForm() {
+        document.getElementById('createNovelForm').style.display = 'none';
+        document.getElementById('novelTitle').value = '';
+        document.getElementById('novelDescription').value = '';
+    }
+    
+    function createNovel() {
+        const title = document.getElementById('novelTitle').value;
+        const description = document.getElementById('novelDescription').value;
+        
+        if (!title || !description) {
+            alert('Please enter title and description');
+            return;
+        }
+        
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        
+        const newNovel = {
+            id: 'novel' + Date.now(),
+            title: title,
+            author: currentUser.name,
+            authorEmail: currentUser.email,
+            description: description,
+            cover: '📖',
+            chapters: []
+        };
+        
+        novels.push(newNovel);
+        localStorage.setItem('novels', JSON.stringify(novels));
+        
+        hideCreateNovelForm();
+        loadWriterNovels();
+        alert('Novel created! You can now add chapters.');
+    }
+    
+    function addChapterToNovel(novelId) {
+        const title = prompt('Enter chapter title:');
+        if (!title) return;
+        
+        const content = prompt('Enter chapter content:');
+        if (!content) return;
+        
+        const novels = JSON.parse(localStorage.getItem('novels'));
+        const novelIndex = novels.findIndex(n => n.id === novelId);
+        
+        const newChapter = {
+            id: 'ch' + Date.now(),
+            title: title,
+            content: '<p>' + content.replace(/\n/g, '</p><p>') + '</p>',
+            isLocked: true,
+            price: 50
+        };
+        
+        novels[novelIndex].chapters.push(newChapter);
+        localStorage.setItem('novels', JSON.stringify(novels));
+        
+        alert('Chapter added successfully!');
+        loadWriterNovels();
+    }
+    
+    // Wallet/Payment functions (simulated)
+    function buyCoins(coins, priceDollars) {
+        if (confirm(`Buy ${coins} coins for $${priceDollars}? (Simulated payment)`)) {
+            currentUser.coins += coins;
+            const users = JSON.parse(localStorage.getItem('users'));
+            users[currentUser.email].coins = currentUser.coins;
+            localStorage.setItem('users', JSON.stringify(users));
+            updateUI();
+            alert(`Successfully purchased ${coins} coins!`);
+        }
+    }
+    
+    // Check for existing session
+    function checkSession() {
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showMainApp();
+            loadNovels();
+            updateUI();
+        } else {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('loginScreen').classList.remove('hidden');
+        }
+    }
+    
+    // Initialize
+    initData();
+    checkSession();
+</script>
+</body>
+</html>
